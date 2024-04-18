@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# wird gerade getestet 01.04.2024
+dateiname=`date '+%F'`-$HOSTNAME.img
+reboot=false
+boot_device=$(findmnt -n / | awk '{ print $2 }' | sed 's/2$//')
+
+while getopts "rhn:" OPTION; do
+        case $OPTION in
+
+                n)
+                        dateiname=$OPTARG
+                        ;;
+
+                h)
+                        echo "Usage:"
+                        echo ""
+                        echo "   -n filename	define custom Filename"
+                        echo "   -r		reboot after backup"
+			echo "   -h     	help (this output)"
+                        exit 0
+                        ;;
+		r)
+			reboot=true
+			;;
+		\?)
+			exit 1
+			;;
+        esac
+done
+
+# gets available backup space
+available=$(df -B1 /media/pi/Backup/ | awk ' END { print $4 }')
+
+# get how big the bootable usb stick is
+all_boot=$(lsblk -b $boot_device | awk ' NR==2 { print $4 }')
+
+# gets used space of backup media
+used=$(df -B1 /media/pi/Backup/ | awk ' END { print $3 }')
+
+# gets how much space the backup media has
+all=$((available + used))
+
+# gets how much space is available after next backup on backup disk
+difference=$((available - all_boot))
+
+# gets 2% of backup disk
+percentage=$(echo " $all * 0.02" | bc | xargs printf "%.0f")
+
+# info
+echo "#####################################"
+echo "Remaining space gets checked."
+echo Threshold: $percentage
+echo After Backup: $difference
+
+# if free space after backup is less than 5% this triggers
+if [ $difference -lt $percentage ]
+then
+	# oldest file is established
+        oldest_file=$(find /media/pi/Backup/ -name "*-$HOSTNAME.img" -type f -printf '%T@ %p\n' | sort -n | head -n 1 | cut -d' ' -f2-)
+        
+	# oldest file gets removed
+	rm "$oldest_file"
+        echo "After this Backup the available space will be under 2%."
+        echo "File /media/pi/Backup/$oldest_file was deleted."
+else
+	echo "Space OK"
+
+fi
+
+# disk gets backed up
+echo "#####################################"
+echo "Backup gets created"
+dd bs=4M if=$boot_device of=/media/pi/Backup/$dateiname
+cd /media/pi/Backup/
+# image gets shrunk
+echo "#####################################"
+echo "Backup gets shrunk"
+docker run --privileged=true --rm --volume $(pwd):/workdir shrink pishrink -v $dateiname
+
+# wenn reboot auf true gesetzt wurde wird nach 5 sekunden neugestartet
+if [ "$reboot" = true ] ; then
+	echo "#####################################"
+	echo "Rebooting..."
+	sleep 5
+	reboot
+fi
