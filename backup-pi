@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# wird gerade getestet 01.04.2024
 dateiname=$HOSTNAME-`date '+%F'`.img
 reboot=false
 boot_device=$(findmnt -n / | awk '{ print $2 }' | sed 's/2$//')
