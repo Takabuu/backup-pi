@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# checks if script is started as root
+if [ $(whoami) != 'root' ]; then
+        echo 'Start Script as root' >&2
+        exit 1
+fi
+
 dateiname=$HOSTNAME-`date '+%F'`.img
 reboot=false
 boot_device=$(findmnt -n / | awk '{ print $2 }' | sed 's/2$//')
