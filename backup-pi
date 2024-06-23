@@ -66,10 +66,10 @@ echo After Backup: $difference
 if [ $difference -lt $percentage ]
 then
 	# oldest file is established
-        oldest_file=$(find $target -name "*-$HOSTNAME.img" -type f -printf '%T@ %p\n' | sort -n | head -n 1 | cut -d' ' -f2-)
+        oldest_file=$(ls -p $target | grep -v / | grep $HOSTNAME | head -n 1)
         
 	# oldest file gets removed
-	rm "$oldest_file"
+	rm "$target/$oldest_file"
         echo "After this Backup the available space will be under 2%."
         echo "File $target/$oldest_file was deleted."
 else
