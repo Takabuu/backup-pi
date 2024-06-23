@@ -63,8 +63,12 @@ echo Threshold: $percentage
 echo After Backup: $difference
 
 # if free space after backup is less than 5% this triggers
-if [ $difference -lt $percentage ]
-then
+while [ $difference -lt $percentage ]
+do
+        # recalculate stuff
+        available=$(df -B1 $target | awk ' END { print $4 }')
+        difference=$((available - all_boot))
+
 	# oldest file is established
         oldest_file=$(ls -p $target | grep -v / | grep $HOSTNAME | head -n 1)
         
@@ -72,10 +76,9 @@ then
 	rm "$target/$oldest_file"
         echo "After this Backup the available space will be under 2%."
         echo "File $target/$oldest_file was deleted."
-else
-	echo "Space OK"
+done
 
-fi
+echo "Space OK"
 
 # disk gets backed up
 echo "#####################################"
