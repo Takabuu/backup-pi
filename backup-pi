@@ -49,7 +49,7 @@ all=$((available + used))
 difference=$((available - all_boot))
 
 # gets 2% of backup disk
-percentage=$(echo " $all * 0.02" | bc | xargs printf "%.0f")
+percentage=$(($all/50))
 
 # info
 echo "#####################################"
