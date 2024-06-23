@@ -33,6 +33,12 @@ while getopts "rhn:t:" OPTION; do
         esac
 done
 
+#checks if variable target was set (target is mandatory)
+if [ -z "$test" ]; then
+        echo 'Missing -t' >&2
+        exit 1
+fi
+
 # gets available backup space
 available=$(df -B1 $target | awk ' END { print $4 }')
 
