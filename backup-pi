@@ -93,5 +93,5 @@ if [ "$reboot" == true ] ; then
 	echo "#####################################"
 	echo "Rebooting..."
 	sleep 5
-	reboot -f
+	shutdown -r 1
 fi
