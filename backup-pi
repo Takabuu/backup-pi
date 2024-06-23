@@ -80,7 +80,8 @@ cd $target
 # image gets shrunk
 echo "#####################################"
 echo "Backup gets shrunk"
-docker run --privileged=true --rm --volume $(pwd):/workdir shrink pishrink -v $dateiname
+# https://github.com/borgesnotes/pishrink-docker
+docker run --privileged=true --rm --volume $(pwd):/workdir borgesnotes/pishrink pishrink -v $dateiname
 
 # wenn reboot auf true gesetzt wurde wird nach 5 sekunden neugestartet
 if [ "$reboot" == true ] ; then
