@@ -79,9 +79,9 @@ echo "Backup gets shrunk"
 docker run --privileged=true --rm --volume $(pwd):/workdir shrink pishrink -v $dateiname
 
 # wenn reboot auf true gesetzt wurde wird nach 5 sekunden neugestartet
-if [ "$reboot" = true ] ; then
+if [ "$reboot" == true ] ; then
 	echo "#####################################"
 	echo "Rebooting..."
 	sleep 5
-	reboot
+	reboot -f
 fi
