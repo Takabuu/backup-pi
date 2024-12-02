@@ -14,10 +14,16 @@ Make executable:
 
 You are ready to backup your Pi! :bowtie:
 
+## Functionality
+
+This script is used to backup a raspberry pi.
+the 
+
 ## Examples
 
-Basic Syntax
+**Basic Syntax**
+A backup gets created to the target /mnt/backup/.
 ```
-    ./backup-pi.sh -t sdb
+    ./backup-pi.sh -t /mnt/backup/
 
 ```
