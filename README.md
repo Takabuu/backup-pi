@@ -2,9 +2,13 @@
 
 ## Installation
 
+Install Docker:
+
+[Docker install how to](https://docs.docker.com/engine/install/)
+
 Download script:
 ```
-    wget https://github.com/Takabuu/backup-pi/blob/main/backup-pi.sh
+    wget https://raw.githubusercontent.com/Takabuu/backup-pi/68f71dbf7854fd7dd0c86379bf5740ec953ebf6c/code/backup-pi.sh
 ```
 
 Make executable:
