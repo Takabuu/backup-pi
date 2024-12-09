@@ -10,8 +10,12 @@ dateiname=$HOSTNAME-`date '+%F'`.img
 reboot=false
 boot_device=$(findmnt -n / | awk '{ print $2 }' | sed -E 's/(2|p)?(2|p)$//')
 
-while getopts "rhn:t:" OPTION; do
+while getopts "arhn:t:" OPTION; do
         case $OPTION in
+
+                a)
+                        autodelete="true"
+                        ;;
 
                 n)
                         dateiname=$OPTARG
@@ -69,20 +73,29 @@ echo Threshold: $percentage
 echo After Backup: $difference
 
 # if free space after backup is less than 5% this triggers
-while [ $difference -lt $percentage ]
-do
-        # recalculate stuff
-        available=$(df -B1 $target | awk ' END { print $4 }')
-        difference=$((available - all_boot))
+if [ $difference -lt $percentage ] ; then
+        if [ "$autodelete" == "true" ] ; then
+                while [ $difference -lt $percentage ]
+                do
+                        # recalculate stuff
+                        available=$(df -B1 $target | awk ' END { print $4 }')
+                        difference=$((available - all_boot))
 
-	# oldest file is established
-        oldest_file=$(ls -p $target | grep -v / | grep $HOSTNAME | head -n 1)
-        
-	# oldest file gets removed
-	rm "$target/$oldest_file"
-        echo "After this Backup the available space will be under 2%."
-        echo "File $target/$oldest_file was deleted."
-done
+                        # oldest file is established
+                        oldest_file=$(ls -p $target | grep -v / | grep $HOSTNAME | head -n 1)
+                        
+                        # oldest file gets removed
+                        rm "$target/$oldest_file"
+                        echo "After this Backup the available space will be under 2%."
+                        echo "File $target/$oldest_file was deleted."
+                done
+        else
+                echo "The current Storage isn't sufficient. Please delete something out of:" $target
+                echo "Or enable the autodelete option"
+                exit 1
+        fi
+
+fi
 
 echo "Space OK"
 
