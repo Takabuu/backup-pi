@@ -8,7 +8,7 @@ fi
 
 dateiname=$HOSTNAME-`date '+%F'`.img
 reboot=false
-boot_device=$(findmnt -n / | awk '{ print $2 }' | sed 's/2$//')
+boot_device=$(findmnt -n / | awk '{ print $2 }' | sed -E 's/(2|p)?(2|p)$//')
 
 while getopts "rhn:t:" OPTION; do
         case $OPTION in
@@ -45,13 +45,13 @@ if [ -z "$target" ]; then
 fi
 
 # gets available backup space
-available=$(df -B1 $target | awk ' END { print $4 }')
+available=$(df -B1 "$target" | awk ' END { print $4 }')
 
 # get how big the bootable usb stick is
-all_boot=$(lsblk -b $boot_device | awk ' NR==2 { print $4 }')
+all_boot=$(lsblk -b "$boot_device" | awk 'NR==2 { print $4 }')
 
 # gets used space of backup media
-used=$(df -B1 $target | awk ' END { print $3 }')
+used=$(df -B1 "$target" | awk ' END { print $3 }')
 
 # gets how much space the backup media has
 all=$((available + used))
